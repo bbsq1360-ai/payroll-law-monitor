@@ -38,3 +38,4 @@ return res.status(200).json({ result: text || '' });
 return res.status(500).json({ error: error.message });
 }
 }
+
