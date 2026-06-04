@@ -18,8 +18,8 @@ headers: {
 'anthropic-version': '2023-06-01'
 },
 body: JSON.stringify({
-model: 'claude-haiku-4-5-20251001',
-max_tokens: 1000,
+model: 'claude-sonnet-4-6',
+max_tokens: 1024,
 tools: [{ type: 'web_search_20250305', name: 'web_search' }],
 messages: [{ role: 'user', content: prompt }]
 })
@@ -33,14 +33,14 @@ if (data.error) {
 }
 
 const textBlocks = data.content
-  .filter(b => b.type === 'text')
-  .map(b => b.text)
+  .filter(function(b) { return b.type === 'text'; })
+  .map(function(b) { return b.text; })
   .join('\\n');
 
 return res.status(200).json({ result: textBlocks });
 ```
 
 } catch (error) {
-return res.status(500).json({ error: '서버 오류가 발생했습니다.' });
+return res.status(500).json({ error: error.message });
 }
 }
