@@ -24,6 +24,11 @@ body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: va
 .header-title span { color: var(--accent-blue); }
 .header-desc { font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
 .badge-date { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-family: 'JetBrains Mono', monospace; color: var(--text-muted); background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 4px 10px; white-space: nowrap; flex-shrink: 0; }
+.date-input-wrap { display: flex; align-items: center; gap: 10px; margin-bottom: 1rem; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 12px 16px; }
+.date-input-wrap label { font-size: 13px; color: var(--text-secondary); white-space: nowrap; }
+.date-input-wrap input[type="date"] { flex: 1; font-size: 14px; font-family: 'Noto Sans KR', sans-serif; border: none; outline: none; background: transparent; color: var(--text-primary); cursor: pointer; }
+.date-reset { font-size: 12px; color: var(--accent-blue); cursor: pointer; white-space: nowrap; background: none; border: none; font-family: 'Noto Sans KR', sans-serif; }
+.date-reset:hover { text-decoration: underline; }
 .search-btn { width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; background: var(--accent-blue); color: #fff; border: none; border-radius: var(--radius-md); padding: 14px 24px; font-size: 15px; font-weight: 500; font-family: 'Noto Sans KR', sans-serif; cursor: pointer; margin-bottom: 1.5rem; transition: background 0.15s, transform 0.1s; }
 .search-btn:hover { background: #163e75; }
 .search-btn:active { transform: scale(0.99); }
@@ -74,6 +79,7 @@ body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: va
 </head>
 <body>
 <div class="container">
+
 <div class="header">
 <div class="header-top">
 <h1 class="header-title">급여 <span>법령 동향</span> 모니터</h1>
@@ -85,20 +91,28 @@ body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: va
 <p class="header-desc">근로기준법 · 4대보험 · 소득세법 관련 24시간 이내 신규 동향 및 주요 기시행 사항을 확인합니다.</p>
 </div>
 
+<!-- 날짜 입력 -->
+<div class="date-input-wrap">
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;flex-shrink:0;color:var(--text-muted)"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+<label for="search-date">조회 기준일</label>
+<input type="date" id="search-date">
+<button class="date-reset" onclick="resetDate()">오늘로 초기화</button>
+</div>
+
 <button class="search-btn" id="search-btn" onclick="runSearch()">
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-오늘 법령 동향 조회하기
+법령 동향 조회하기
 </button>
 
 <div class="card">
 <div class="card-header">
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-<span class="card-header-title">오늘 신규 동향 (24시간 이내)</span>
+<span class="card-header-title" id="news-title">신규 동향 (24시간 이내)</span>
 </div>
 <div id="news-section">
 <div class="no-news">
 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-조회 버튼을 눌러 오늘 법령 동향을 확인하세요.
+날짜를 선택하고 조회 버튼을 눌러주세요.
 </div>
 </div>
 </div>
@@ -179,6 +193,7 @@ body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: va
 <span class="footer-left">대한민국 Payroll Specialist · 법령 동향 모니터링 도구</span>
 <span class="footer-right" id="footer-date">--</span>
 </div>
+
 </div>
 
 <script>
@@ -190,18 +205,48 @@ const day = String(d.getDate()).padStart(2,'0');
 return { full: y+'년 '+m+'월 '+day+'일', iso: y+'-'+m+'-'+day };
 }
 
-const t = getToday();
-document.getElementById('today-str').textContent = t.full;
-document.getElementById('footer-date').textContent = t.iso + ' 기준';
-document.getElementById('kw1').textContent = '2026 근로기준법 개정사항 after:' + t.iso;
-document.getElementById('kw2').textContent = '2026 4대보험 개정사항 after:' + t.iso;
-document.getElementById('kw3').textContent = '2026 소득세법 개정사항 after:' + t.iso;
+function isoToFull(iso) {
+const [y, m, d] = iso.split('-');
+return y+'년 '+m+'월 '+d+'일';
+}
+
+const today = getToday();
+document.getElementById('today-str').textContent = today.full;
+document.getElementById('footer-date').textContent = today.iso + ' 기준';
+document.getElementById('search-date').value = today.iso;
+updateKeywords(today.iso);
+
+document.getElementById('search-date').addEventListener('change', function() {
+updateKeywords(this.value);
+});
+
+function updateKeywords(iso) {
+document.getElementById('kw1').textContent = '2026 근로기준법 개정사항 after:' + iso;
+document.getElementById('kw2').textContent = '2026 4대보험 개정사항 after:' + iso;
+document.getElementById('kw3').textContent = '2026 소득세법 개정사항 after:' + iso;
+}
+
+function resetDate() {
+document.getElementById('search-date').value = today.iso;
+updateKeywords(today.iso);
+}
 
 async function runSearch() {
-const btn = document.getElementById('search-btn');
-const news = document.getElementById('news-section');
+const dateVal = document.getElementById('search-date').value;
+if (!dateVal) {
+alert('날짜를 선택해주세요.');
+return;
+}
 
 ```
+const fullDate = isoToFull(dateVal);
+const btn = document.getElementById('search-btn');
+const news = document.getElementById('news-section');
+const newsTitle = document.getElementById('news-title');
+
+newsTitle.textContent = fullDate + ' 기준 신규 동향 (24시간 이내)';
+document.getElementById('footer-date').textContent = dateVal + ' 기준';
+
 btn.disabled = true;
 btn.innerHTML = '<span class="spinner"></span> 검색 중...';
 news.innerHTML = '<div class="no-news"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px;flex-shrink:0;animation:spin 0.7s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>법령 동향을 검색하고 있습니다...</div>';
@@ -209,15 +254,15 @@ news.innerHTML = '<div class="no-news"><svg viewBox="0 0 24 24" fill="none" stro
 const prompt = `당신은 대한민국 Payroll Specialist를 위한 법령 동향 정리 도우미입니다.
 ```
 
-오늘 날짜: ${t.full} (${t.iso})
+조회 기준일: ${fullDate} (${dateVal})
 
-아래 키워드로 오늘 기준 24시간 이내 업로드된 근로기준법·4대보험·소득세법 관련 내용만 찾아서 카테고리별로 정리해주세요.
+아래 키워드로 ${fullDate} 기준 24시간 이내 업로드된 근로기준법·4대보험·소득세법 관련 내용만 찾아서 카테고리별로 정리해주세요.
 
 검색 키워드:
 
-- 2026 근로기준법 개정사항 after:${t.iso}
-- 2026 4대보험 개정사항 after:${t.iso}
-- 2026 소득세법 개정사항 after:${t.iso}
+- 2026 근로기준법 개정사항 after:${dateVal}
+- 2026 4대보험 개정사항 after:${dateVal}
+- 2026 소득세법 개정사항 after:${dateVal}
 
 참고 사이트:
 
@@ -227,7 +272,7 @@ const prompt = `당신은 대한민국 Payroll Specialist를 위한 법령 동�
 
 규칙:
 
-- 24시간 이내 관련 내용이 없으면 "오늘(${t.full}) 24시간 이내 업로드된 관련 신규 내용 없음" 으로 표기
+- 24시간 이내 관련 내용이 없으면 "${fullDate} 24시간 이내 업로드된 관련 신규 내용 없음" 으로 표기
 - 있으면 카테고리별(근로기준법 / 4대보험 / 소득세법)로 간결하게 정리
 - 출처 URL 포함`;
     
@@ -246,7 +291,7 @@ const prompt = `당신은 대한민국 Payroll Specialist를 위한 법령 동�
     } else if (data.result && data.result.trim()) {
       news.innerHTML = '<div class="result-content">' + data.result.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\\n/g,'<br>') + '</div>';
     } else {
-      news.innerHTML = '<div class="no-news">오늘(' + t.full + ') 24시간 이내 업로드된 관련 신규 내용 없음</div>';
+      news.innerHTML = '<div class="no-news">' + fullDate + ' 24시간 이내 업로드된 관련 신규 내용 없음</div>';
     }
     ```
     
@@ -255,7 +300,7 @@ const prompt = `당신은 대한민국 Payroll Specialist를 위한 법령 동�
     }
     
     btn.disabled = false;
-    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;flex-shrink:0"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>다시 조회하기';
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;flex-shrink:0"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>법령 동향 조회하기';
     }
     </script>
     </body>
