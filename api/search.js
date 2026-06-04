@@ -4,7 +4,6 @@ return res.status(405).json({ error: 'Method not allowed' });
 }
 
 const { prompt } = req.body;
-
 if (!prompt) {
 return res.status(400).json({ error: 'Prompt is required' });
 }
@@ -19,7 +18,7 @@ headers: {
 },
 body: JSON.stringify({
 model: 'claude-haiku-4-5-20251001',
-max_tokens: 1024,
+max_tokens: 2048,
 tools: [{ type: 'web_search_20250305', name: 'web_search' }],
 messages: [{ role: 'user', content: prompt }]
 })
@@ -33,15 +32,25 @@ if (data.error) {
 }
 
 if (!data.content || !Array.isArray(data.content)) {
-  return res.status(500).json({ error: JSON.stringify(data) });
+  return res.status(500).json({ error: 'No content in response' });
 }
 
 const textBlocks = data.content
-  .filter(function(b) { return b.type === 'text'; })
+  .filter(function(b) { return b && b.type === 'text' && b.text; })
   .map(function(b) { return b.text; })
   .join('\\n');
 
-return res.status(200).json({ result: textBlocks || 'no result' });
+if (textBlocks) {
+  return res.status(200).json({ result: textBlocks });
+}
+
+// tool_use로 끝난 경우 두 번째 요청
+const toolResults = data.content
+  .filter(function(b) { return b && b.type === 'tool_result'; })
+  .map(function(b) { return b.content || ''; })
+  .join('\\n');
+
+return res.status(200).json({ result: toolResults || '검색 결과가 없습니다.' });
 ```
 
 } catch (error) {
