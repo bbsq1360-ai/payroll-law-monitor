@@ -32,12 +32,16 @@ if (data.error) {
   return res.status(500).json({ error: data.error.message });
 }
 
+if (!data.content || !Array.isArray(data.content)) {
+  return res.status(500).json({ error: JSON.stringify(data) });
+}
+
 const textBlocks = data.content
   .filter(function(b) { return b.type === 'text'; })
   .map(function(b) { return b.text; })
   .join('\\n');
 
-return res.status(200).json({ result: textBlocks });
+return res.status(200).json({ result: textBlocks || 'no result' });
 ```
 
 } catch (error) {
