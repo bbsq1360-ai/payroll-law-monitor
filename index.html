@@ -251,26 +251,22 @@ btn.disabled = true;
 btn.innerHTML = '<span class="spinner"></span> 검색 중...';
 news.innerHTML = '<div class="no-news"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:15px;height:15px;flex-shrink:0;animation:spin 0.7s linear infinite"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg>법령 동향을 검색하고 있습니다...</div>';
 
-var prompt = '당신은 대한민국 Payroll Specialist를 위한 법령 동향 정리 도우미입니다.\\n'
-  + '조회 기준일: ' + fullDate + ' (' + dateVal + ')\\n\\n'
-  + '아래 키워드로 ' + fullDate + ' 기준 24시간 이내 업로드된 근로기준법, 4대보험, 소득세법 관련 내용만 찾아서 카테고리별로 정리해주세요.\\n\\n'
-  + '검색 키워드:\\n'
-  + '- 2026 근로기준법 개정사항 after:' + dateVal + '\\n'
-  + '- 2026 4대보험 개정사항 after:' + dateVal + '\\n'
-  + '- 2026 소득세법 개정사항 after:' + dateVal + '\\n\\n'
-  + '참고 사이트:\\n'
-  + '- <https://www.lawtimes.co.kr/news/articleList.html?sc_sub_section_code=S2N3&view_type=sm\\n>'
-  + '- <https://www.joseilbo.com/news/news_base.php?class=1&menu1=1&menu2=2\\n>'
-  + '- <https://webzine.kacta.or.kr/news/articleList.html?sc_sub_section_code=S2N1&view_type=sm\\n\\n>'
-  + '규칙:\\n'
-  + '- 24시간 이내 관련 내용이 없으면 "' + fullDate + ' 24시간 이내 업로드된 관련 신규 내용 없음" 으로 표기\\n'
-  + '- 있으면 카테고리별(근로기준법 / 4대보험 / 소득세법)로 간결하게 정리\\n'
-  + '- 출처 URL 포함';
+var searchPrompt = '당신은 대한민국 Payroll Specialist를 위한 법령 동향 정리 도우미입니다.'
+  + ' 조회 기준일: ' + fullDate + ' (' + dateVal + ').'
+  + ' 아래 키워드로 ' + fullDate + ' 기준 24시간 이내 업로드된 근로기준법, 4대보험, 소득세법 관련 내용만 찾아서 카테고리별로 정리해주세요.'
+  + ' 검색 키워드: 2026 근로기준법 개정사항 after:' + dateVal
+  + ', 2026 4대보험 개정사항 after:' + dateVal
+  + ', 2026 소득세법 개정사항 after:' + dateVal
+  + '. 참고 사이트: <https://www.lawtimes.co.kr/news/articleList.html?sc_sub_section_code=S2N3&view_type=sm>'
+  + ', <https://www.joseilbo.com/news/news_base.php?class=1&menu1=1&menu2=2>'
+  + ', <https://webzine.kacta.or.kr/news/articleList.html?sc_sub_section_code=S2N1&view_type=sm>'
+  + '. 규칙: 24시간 이내 관련 내용이 없으면 "' + fullDate + ' 24시간 이내 업로드된 관련 신규 내용 없음" 으로 표기.'
+  + ' 있으면 카테고리별(근로기준법, 4대보험, 소득세법)로 간결하게 정리. 출처 URL 포함.';
 
 fetch('/api/search', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ prompt: prompt })
+  body: JSON.stringify({ prompt: searchPrompt })
 })
 .then(function(res) { return res.json(); })
 .then(function(data) {
